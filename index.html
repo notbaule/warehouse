@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<title>Warehouse Rechner</title>
+<style>
+    body {
+        font-family: Arial, sans-serif;
+        padding: 20px;
+        background: #f5f5f5;
+    }
+    h1 { text-align: center; }
+    h2 { margin-top: 40px; }
+    table {
+        width: 100%;
+        border-collapse: collapse;
+        background: #fff;
+        margin-bottom: 20px;
+        box-shadow: 0 0 5px #aaa;
+    }
+    th, td {
+        border: 1px solid #ddd;
+        padding: 8px;
+        text-align: center;
+    }
+    th {
+        background: #222;
+        color: white;
+    }
+    input {
+        width: 70px;
+        padding: 5px;
+        text-align: center;
+    }
+    .summary {
+        padding: 20px;
+        background: #fff;
+        box-shadow: 0 0 5px #aaa;
+        font-size: 18px;
+        width: 100%;
+    }
+    .highlight {
+        font-weight: bold;
+        font-size: 20px;
+        color: green;
+    }
+</style>
+</head>
+<body>
+
+<h1>Warehouse Rechner</h1>
+<div id="tables"></div>
+
+<div class="summary">
+    <p>Einkauf Gesamt: <span id="sumBuy">0</span> $</p>
+    <p>Verkauf Gesamt: <span id="sumSell">0</span> $</p>
+    <p class="highlight">Gewinn Gesamt: <span id="sumProfit">0</span> $</p>
+</div>
+
+<script>
+const categories = {
+"Obst/Gemüse": [
+    ["Zwiebeln", 2, 15],
+    ["Kartoffeln", 3, 10],
+    ["Kopfsalat", 2, 15],
+    ["Mais", 2, 10],
+    ["Bohnen", 3, 15],
+    ["Tomaten", 2, 10]
+],
+"Fisch/Fleisch": [
+    ["Lachsfilet", 17, 120],
+    ["Wiener", 10, 50],
+    ["Rindfleisch", 20, 120],
+    ["Chickenwings", 15, 60],
+    ["Burgerpatty´s", 10, 30]
+],
+"Teigwaren": [
+    ["Nudeln", 1, 5],
+    ["Brot", 2, 15],
+    ["Waps", 3, 10],
+    ["Lasagneblätter", 4, 30],
+    ["Tortilla", 5, 20]
+],
+"Tierische Lebensmittel": [
+    ["Milch", 6, 25],
+    ["Eier", 1, 5]
+],
+"Sonstiges": [
+    ["Ketchup", 3, 21],
+    ["Mehl", 2, 14],
+    ["Zucker", 3, 20],
+    ["Kakao", 4, 25],
+    ["Wasser", 1, 5],
+    ["Kaffeebohnen", 5, 30],
+    ["Erbsen", 3, 20],
+    ["Butter", 3, 10],
+    ["Soße", 4, 16],
+    ["Pfeffer", 2, 10],
+    ["Vanille", 4, 20],
+    ["Schoki Doki", 5, 30],
+    ["Weisswein", 7, 40],
+    ["Rotwein", 7, 40],
+    ["Whiskey", 9, 35],
+    ["Bier", 3, 20],
+    ["Champagner", 10, 60],
+    ["eistee pfirsich", 4, 10],
+    ["eistee zitrone", 4, 10],
+    ["Cola", 2, 35],
+    ["Tabakblätter", 2, 10],
+    ["Feinschnitt", 2, 10],
+    ["Grappa", 8, 10],
+    ["Cognac", 8, 10],
+    ["Rum", 8, 10]
+]
+};
+
+function buildTables() {
+    const container = document.getElementById("tables");
+
+    for (const [catName, items] of Object.entries(categories)) {
+        let html = `<h2>${catName}</h2><table><tr>
+            <th>Ware</th><th>Grundpreis</th><th>Endpreis</th><th>Menge</th>
+            <th>Einkauf</th><th>Verkauf</th><th>Gewinn</th>
+        </tr>`;
+
+        items.forEach((item, i) => {
+            const id = catName + "_" + i;
+            html += `
+            <tr>
+                <td>${item[0]}</td>
+                <td>${item[1]} $</td>
+                <td>${item[2]} $</td>
+                <td><input type="number" min="0" value="0" id="qty_${id}" oninput="update()"></td>
+                <td id="buy_${id}">0</td>
+                <td id="sell_${id}">0</td>
+                <td id="profit_${id}">0</td>
+            </tr>`;
+        });
+
+        html += "</table>";
+        container.innerHTML += html;
+    }
+}
+
+function update() {
+    let totalBuy = 0;
+    let totalSell = 0;
+
+    for (const [catName, items] of Object.entries(categories)) {
+        items.forEach((item, i) => {
+            const id = catName + "_" + i;
+
+            const qty = parseInt(document.getElementById("qty_" + id).value) || 0;
+            const buy = qty * item[1];
+            const sell = qty * item[2];
+            const profit = sell - buy;
+
+            document.getElementById("buy_" + id).textContent = buy;
+            document.getElementById("sell_" + id).textContent = sell;
+            document.getElementById("profit_" + id).textContent = profit;
+
+            totalBuy += buy;
+            totalSell += sell;
+        });
+    }
+
+    document.getElementById("sumBuy").textContent = totalBuy;
+    document.getElementById("sumSell").textContent = totalSell;
+    document.getElementById("sumProfit").textContent = totalSell - totalBuy;
+}
+
+buildTables();
+</script>
+
+</body>
+</html>
